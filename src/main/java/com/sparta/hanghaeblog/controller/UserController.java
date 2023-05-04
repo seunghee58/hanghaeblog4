@@ -1,6 +1,5 @@
 package com.sparta.hanghaeblog.controller;
 
-
 import com.sparta.hanghaeblog.dto.ApiResult;
 import com.sparta.hanghaeblog.dto.LoginRequestDto;
 import com.sparta.hanghaeblog.dto.SignupRequestDto;
@@ -15,7 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 @Validated
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("api/auth")
+@RequestMapping("/api/auth")
 public class UserController {
 
     private final UserService userService;
@@ -27,7 +26,6 @@ public class UserController {
     }
 
     // 로그인 API
-    @ResponseBody
     @PostMapping("/login")
     public ApiResult login(@RequestBody LoginRequestDto loginRequestDto, HttpServletResponse httpServletResponse) {
         return userService.login(loginRequestDto, httpServletResponse);

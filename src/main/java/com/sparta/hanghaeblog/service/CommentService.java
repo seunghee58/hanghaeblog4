@@ -11,12 +11,10 @@ import com.sparta.hanghaeblog.jwt.JwtUtil;
 import com.sparta.hanghaeblog.repository.CommentRepository;
 import com.sparta.hanghaeblog.repository.PostRepository;
 import com.sparta.hanghaeblog.repository.UserRepository;
-import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.servlet.http.HttpServletRequest;
 
 @Service
 @RequiredArgsConstructor
@@ -29,8 +27,7 @@ public class CommentService {
 
     // Comment 작성
     @Transactional
-    public CommentResponseDto createComment(Long postId, CommentRequestDto commentRequestDto, HttpServletRequest httpServletRequest) {
-        User user = checkToken(httpServletRequest);
+    public CommentResponseDto createComment(Long postId, CommentRequestDto commentRequestDto, User user) {
 
         Post post = postRepository.findById(postId).orElseThrow(
                 () -> new IllegalArgumentException("게시글이 존재하지 않습니다.")
@@ -43,8 +40,7 @@ public class CommentService {
 
     // Comment 수정
     @Transactional
-    public CommentResponseDto updateComment(Long commentId, CommentRequestDto commentRequestDto, HttpServletRequest httpServletRequest) {
-        User user = checkToken(httpServletRequest);
+    public CommentResponseDto updateComment(Long commentId, CommentRequestDto commentRequestDto, User user) {
 
         Comment comment = commentRepository.findById(commentId).orElseThrow(
                 () -> new IllegalArgumentException("해당 댓글이 존재하지 않습니다.")
@@ -59,8 +55,7 @@ public class CommentService {
     }
 
     /// Comment 삭제
-    public ApiResult deleteComment(Long commentId, HttpServletRequest httpServletRequest) {
-        User user = checkToken(httpServletRequest);
+    public ApiResult deleteComment(Long commentId, User user) {
 
         Comment comment = commentRepository.findById(commentId).orElseThrow(
                 () -> new IllegalArgumentException("해당 댓글이 존재하지 않습니다.")
@@ -72,30 +67,5 @@ public class CommentService {
         } else {
             return new ApiResult("작성자만 삭제할 수 있습니다.", 400);
         }
-
-    }
-
-    // Token 체크
-    public User checkToken(HttpServletRequest request){
-
-        String token = jwtUtil.resolveToken(request);
-        Claims claims;
-
-        if (token != null) {
-            if (jwtUtil.validateToken(token)) {
-                // 토큰에서 사용자 정보 가져오기
-                claims = jwtUtil.getUserInfoFromToken(token);
-            } else {
-                throw new IllegalArgumentException("Token Error");
-            }
-
-            // 토큰에서 가져온 사용자 정보를 사용하여 DB 조회
-            User user = userRepository.findByUsername(claims.getSubject()).orElseThrow(
-                    () -> new IllegalArgumentException("사용자가 존재하지 않습니다.")
-            );
-            return user;
-
-        }
-        return null;
     }
 }

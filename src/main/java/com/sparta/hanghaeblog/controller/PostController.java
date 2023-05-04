@@ -3,8 +3,11 @@ package com.sparta.hanghaeblog.controller;
 import com.sparta.hanghaeblog.dto.ApiResult;
 import com.sparta.hanghaeblog.dto.PostRequestDto;
 import com.sparta.hanghaeblog.dto.PostResponseDto;
+import com.sparta.hanghaeblog.entity.User;
+import com.sparta.hanghaeblog.security.UserDetailsImpl;
 import com.sparta.hanghaeblog.service.PostService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -36,13 +39,13 @@ public class PostController {
 
     // Post 수정 API
     @PutMapping("/api/posts/{id}")
-    public PostResponseDto updatePost(@PathVariable Long id, @RequestBody PostRequestDto requestDto, HttpServletRequest request) {
-        return postService.updatepost(id, requestDto, request);
+    public PostResponseDto updatePost(@PathVariable Long id, @RequestBody PostRequestDto requestDto, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return postService.updatepost(id, requestDto, userDetails.getUser());
     }
 
     // Post 삭제 API
     @DeleteMapping("/api/posts/{id}")
-    public ApiResult deletePost(@PathVariable Long id, HttpServletRequest httpServletRequest) {
-        return postService.deletePost(id, httpServletRequest);
+    public ApiResult deletePost(@PathVariable Long id, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return postService.deletePost(id, userDetails.getUser());
     }
 }
